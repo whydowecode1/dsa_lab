@@ -1,86 +1,246 @@
 #include <iostream>
 using namespace std;
 
-struct Node {
+class Node {
+public:
     int data;
     Node* next;
+
+    Node(int val) {
+        data = val;
+        next = nullptr;
+    }
 };
 
-Node* create(int A[], int n) {
-    if (n == 0) return nullptr;
+Node* insertBeg(Node* head, int val) {
+    Node* temp = new Node(val);
+    temp->next = head;
+    return temp;
+}
 
-    Node *head = new Node{A[0], nullptr};
-    Node *previous = head;
+Node* insertEnd(Node* head, int val) {
+    Node* temp = new Node(val);
+    if (head == nullptr) return temp;
 
-    for (int i = 1; i < n; i++) {
-        Node *temp = new Node{A[i], nullptr};
-        previous->next = temp;
-        previous = temp;
-    }
+    Node* curr = head;
+    while (curr->next != nullptr)
+        curr = curr->next;
+
+    curr->next = temp;
     return head;
+}
+
+Node* insertBefore(Node* head, int target, int val) {
+    if (head == nullptr) return head;
+
+    if (head->data == target)
+        return insertBeg(head, val);
+
+    Node* prev = nullptr;
+    Node* curr = head;
+
+    while (curr != nullptr && curr->data != target) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (curr == nullptr) return head;
+
+    Node* temp = new Node(val);
+    prev->next = temp;
+    temp->next = curr;
+
+    return head;
+}
+
+Node* insertAfter(Node* head, int target, int val) {
+    Node* curr = head;
+
+    while (curr != nullptr && curr->data != target)
+        curr = curr->next;
+
+    if (curr == nullptr) return head;
+
+    Node* temp = new Node(val);
+    temp->next = curr->next;
+    curr->next = temp;
+
+    return head;
+}
+
+Node* deleteBeg(Node* head) {
+    if (head == nullptr) return nullptr;
+
+    Node* temp = head;
+    head = head->next;
+    cout << "Deleted: " << temp->data << endl;
+    delete temp;
+
+    return head;
+}
+
+Node* deleteEnd(Node* head) {
+    if (head == nullptr) return nullptr;
+    if (head->next == nullptr) {
+        cout << "Deleted: " << head->data << endl;
+        delete head;
+        return nullptr;
+    }
+
+    Node* prev = nullptr;
+    Node* curr = head;
+
+    while (curr->next != nullptr) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    cout << "Deleted: " << curr->data << endl;
+    prev->next = nullptr;
+    delete curr;
+
+    return head;
+}
+
+Node* deleteValue(Node* head, int val) {
+    if (head == nullptr) return nullptr;
+
+    if (head->data == val) {
+        Node* temp = head;
+        head = head->next;
+        cout << "Deleted: " << temp->data << endl;
+        delete temp;
+        return head;
+    }
+
+    Node* prev = nullptr;
+    Node* curr = head;
+
+    while (curr != nullptr && curr->data != val) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (curr == nullptr) return head;
+
+    prev->next = curr->next;
+    cout << "Deleted: " << curr->data << endl;
+    delete curr;
+
+    return head;
+}
+
+void search(Node* head, int val) {
+    Node* curr = head;
+    int pos = 1;
+
+    while (curr != nullptr) {
+        if (curr->data == val) {
+            cout << val << " found at position " << pos << endl;
+            return;
+        }
+        curr = curr->next;
+        pos++;
+    }
+
+    cout << "Value not found.\n";
 }
 
 void display(Node* head) {
     if (head == nullptr) {
-        cout << "List is empty";
+        cout << "List is empty.\n";
         return;
     }
-    Node* temp = head;
-    while (temp != nullptr) {
-        cout << temp->data << " -> ";
-        temp = temp->next;
+
+    Node* curr = head;
+    while (curr != nullptr) {
+        cout << curr->data << " -> ";
+        curr = curr->next;
     }
-}
-
-void search(Node* head, int num) {
-    if (head == nullptr) {
-        cout << "List is empty";
-        return;
-    }
-    Node* temp = head;
-    while (temp != nullptr && temp->data != num)
-        temp = temp->next;
-
-    if (temp == nullptr)
-        cout << "Element not found";
-    else
-        cout << "Element found";
-}
-
-Node* insertBeg(Node* head, int num) {
-    Node* temp = new Node{num, head};
-    return temp;
-}
-
-Node* deleteBeg(Node* head) {
-    if (head == nullptr) {
-        cout << "List is empty";
-        return nullptr;
-    }
-    Node* temp = head;
-    head = head->next;
-    delete temp;
-    return head;
+    cout << "NULL\n";
 }
 
 int main() {
-    int A[] = {3, 5, 7, 10, 25, 8, 32, 2};
-    Node* head = create(A, 8);
+    Node* head = nullptr;
+    int choice, val, target;
 
-    cout << "Linked list created: ";
-    display(head);
+    do {
+        cout << "\n---- MENU ----\n";
+        cout << "1. Insert at beginning\n";
+        cout << "2. Insert at end\n";
+        cout << "3. Insert BEFORE a value\n";
+        cout << "4. Insert AFTER a value\n";
+        cout << "5. Delete from beginning\n";
+        cout << "6. Delete from end\n";
+        cout << "7. Delete a specific value\n";
+        cout << "8. Search a value\n";
+        cout << "9. Display list\n";
+        cout << "0. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
 
-    cout << "\nSearch for element: ";
-    search(head, 80);
+        switch (choice) {
+            case 1:
+                cout << "Enter value: ";
+                cin >> val;
+                head = insertBeg(head, val);
+                break;
 
-    cout << "\nInsert at beginning: ";
-    head = insertBeg(head, 80);
-    display(head);
+            case 2:
+                cout << "Enter value: ";
+                cin >> val;
+                head = insertEnd(head, val);
+                break;
 
-    cout << "\nDelete from beginning: ";
-    head = deleteBeg(head);
-    display(head);
+            case 3:
+                cout << "Enter target value: ";
+                cin >> target;
+                cout << "Enter new value: ";
+                cin >> val;
+                head = insertBefore(head, target, val);
+                break;
 
-    cout << endl;
+            case 4:
+                cout << "Enter target value: ";
+                cin >> target;
+                cout << "Enter new value: ";
+                cin >> val;
+                head = insertAfter(head, target, val);
+                break;
+
+            case 5:
+                head = deleteBeg(head);
+                break;
+
+            case 6:
+                head = deleteEnd(head);
+                break;
+
+            case 7:
+                cout << "Enter value to delete: ";
+                cin >> val;
+                head = deleteValue(head, val);
+                break;
+
+            case 8:
+                cout << "Enter value to search: ";
+                cin >> val;
+                search(head, val);
+                break;
+
+            case 9:
+                display(head);
+                break;
+
+            case 0:
+                cout << "Exiting...\n";
+                break;
+
+            default:
+                cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 0);
+
     return 0;
 }
